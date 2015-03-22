@@ -16,8 +16,8 @@ module EmailIntegration
       MESSAGE_REPLY_SUBJECT_RE = %r{\[[^\]]*msg(\d+)\]}
 
       def dispatch_with_email_integration
-        # タイトルに特定のパターンにマッチしたら
-        # デフォルトアクションに処理してもらう
+        # Default action if subject has special keywords
+        # ex) [#id]
         headers = [email.in_reply_to, email.references].flatten.compact
         subject = email.subject.to_s
         if headers.detect {|h| h.to_s =~ MESSAGE_ID_RE} || subject.match(ISSUE_REPLY_SUBJECT_RE) || subject.match(MESSAGE_REPLY_SUBJECT_RE)
