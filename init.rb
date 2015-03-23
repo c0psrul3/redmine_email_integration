@@ -1,4 +1,4 @@
-require 'mail_handler_patch'
+require 'redmine_email_integration/mail_handler_patch'
 
 Redmine::Plugin.register :redmine_email_integration do
   name 'Redmine Email Integration plugin'

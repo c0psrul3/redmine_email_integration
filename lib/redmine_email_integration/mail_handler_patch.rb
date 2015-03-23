@@ -16,6 +16,7 @@ module EmailIntegration
       MESSAGE_REPLY_SUBJECT_RE = %r{\[[^\]]*msg(\d+)\]}
 
       def dispatch_with_email_integration
+        binding.pry
         # Default action if subject has special keywords
         # ex) [#id]
         headers = [email.in_reply_to, email.references].flatten.compact
