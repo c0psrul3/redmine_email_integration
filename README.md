@@ -1,6 +1,6 @@
 # Redmine Email Integration Plugin
 
-This plugin saves reply email as a ticket's notes.
+This plugin saves reply emails as ticket's notes.
 
 Inspired by [redmine_mail_intergration](https://github.com/YusukeKokubo/redmine_mail_intergration).
 
