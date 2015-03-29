@@ -1,6 +1,6 @@
 # Redmine Email Integration Plugin
 
-This plugin saves reply emails as ticket's notes.
+This plugin saves "Message-ID" of email to associate an email with an issue/reply (journal).
 
 Inspired by [redmine_mail_intergration](https://github.com/YusukeKokubo/redmine_mail_intergration).
 
