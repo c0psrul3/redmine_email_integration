@@ -39,6 +39,38 @@ class EmailMessageTest < ActiveSupport::TestCase
     assert_equal journal.id, issue.journals.last.id
   end
 
+  def test_prevent_duplicate_issue
+    issue1 = submit_email('new_email.eml',
+                         :issue => {:project => 'email_integration_project_1'},
+                         :unknown_user => 'accept',
+                         :no_permission_check => 1)
+    assert_issue_created issue1
+    issue2 = submit_email('new_email.eml',
+                         :issue => {:project => 'email_integration_project_1'},
+                         :unknown_user => 'accept',
+                         :no_permission_check => 1)
+    assert_equal false, issue2
+  end
+
+  def test_prevent_duplicate_reply
+    issue = submit_email('new_email.eml',
+                         :issue => {:project => 'email_integration_project_1'},
+                         :unknown_user => 'accept',
+                         :no_permission_check => 1)
+    assert_issue_created issue
+    journal1 = submit_email('email_reply.eml',
+                         :issue => {:project => 'email_integration_project_1'},
+                         :unknown_user => 'accept',
+                         :no_permission_check => 1)
+    assert journal1.is_a?(Journal)
+    assert_equal journal1.id, issue.journals.last.id
+    journal2 = submit_email('email_reply.eml',
+                         :issue => {:project => 'email_integration_project_1'},
+                         :unknown_user => 'accept',
+                         :no_permission_check => 1)
+    assert_equal false, journal2
+  end
+
   private
 
     def submit_email(filename, options={})

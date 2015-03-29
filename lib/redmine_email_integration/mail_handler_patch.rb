@@ -16,48 +16,39 @@ module EmailIntegration
       MESSAGE_REPLY_SUBJECT_RE = %r{\[[^\]]*msg(\d+)\]}
 
       def dispatch_with_email_integration
-        binding.pry
+        # Prevent duplicate ticket creation
+        origin_message = EmailMessage.find_by message_id: email.message_id
+        return false if origin_message
+
         # Default action if subject has special keywords
         # ex) [#id]
         headers = [email.in_reply_to, email.references].flatten.compact
         subject = email.subject.to_s
         if headers.detect {|h| h.to_s =~ MESSAGE_ID_RE} || subject.match(ISSUE_REPLY_SUBJECT_RE) || subject.match(MESSAGE_REPLY_SUBJECT_RE)
           dispatch_without_email_integration
+          save_message_id(email.message_id)
           return
         end
 
         origin_message_id = email.references.first if email.references.class == Array
         origin_message_id = email.in_reply_to unless origin_message_id
 
-        # New email
         unless origin_message_id
-          # Prevent duplicate ticket creation
-          # Example:
-          #   to: a@example.com
-          #   cc: alias_has_a@example.com
-          origin_message = EmailMessage.find_by message_id: email.message_id
-          return if origin_message
-
-          # Create new issue
+          # New mail
           issue = receive_issue
           issue.description = email_details + issue.description
           issue.save
-          current_email_message            = EmailMessage.new
-          current_email_message.issue_id   = issue.id
-          current_email_message.message_id = email.message_id
-          current_email_message.save
+          save_message_id(email.message_id, issue.id)
           return issue
-        end
-
-        # Reply mail
-        #  - Save journal if associated message-id exists
-        origin_message = EmailMessage.find_by message_id: origin_message_id
-        unless origin_message
-          # ignore
         else
+          # Reply mail
+          origin_message = EmailMessage.find_by(message_id: origin_message_id)
+          return unless origin_message or origin_message.issue_id
+
           journal = receive_issue_reply(origin_message.issue_id)
           journal.notes = email_details + email_reply_collapse(journal.notes)
           journal.save
+          save_message_id(email.message_id)
           journal
         end
       end
@@ -109,6 +100,15 @@ module EmailIntegration
           end
         end
         notes
+      end
+
+      def save_message_id(message_id, issue_id=nil)
+        return false unless message_id 
+
+        message            = EmailMessage.new
+        message.message_id = message_id
+        message.issue_id   = issue_id if issue_id
+        message.save
       end
 
     end # module InstanceMethods
