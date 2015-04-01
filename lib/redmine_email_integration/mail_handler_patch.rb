@@ -17,8 +17,7 @@ module EmailIntegration
 
       def dispatch_with_email_integration
         # Prevent duplicate ticket creation
-        origin_message = EmailMessage.find_by message_id: email.message_id
-        return false if origin_message
+        return false if EmailMessage.message_id_exists?(email.message_id)
 
         # Default action if subject has special keywords
         # ex) [#id]
@@ -42,8 +41,7 @@ module EmailIntegration
           return issue
         else
           # Reply mail
-          origin_message = EmailMessage.find_by(message_id: origin_message_id)
-          return unless origin_message or origin_message.issue_id
+          return false unless EmailMessage.message_id_exists?(origin_message_id)
 
           journal = receive_issue_reply(origin_message.issue_id)
           journal.notes = email_details + email_reply_collapse(journal.notes)
