@@ -41,13 +41,14 @@ module EmailIntegration
           return issue
         else
           # Reply mail
-          return false unless EmailMessage.message_id_exists?(origin_message_id)
+          origin_message = EmailMessage.find_by(message_id: origin_message_id)
+          return false if origin_message.nil?
 
           journal = receive_issue_reply(origin_message.issue_id)
           journal.notes = email_details + email_reply_collapse(journal.notes)
           journal.save
           save_message_id(email.message_id)
-          journal
+          return journal
         end
       end
 
