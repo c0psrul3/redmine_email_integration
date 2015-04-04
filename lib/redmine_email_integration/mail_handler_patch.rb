@@ -17,16 +17,20 @@ module EmailIntegration
 
       def dispatch_with_email_integration
         # Prevent duplicate ticket creation
-        return false if EmailMessage.message_id_exists?(email.message_id)
+        if EmailMessage.message_id_exists?(email.message_id)
+          logger.debug "[redmine_email_integration] Ignore duplicate email" if logger && logger.debug?
+          return false
+        end
 
         # Default action if subject has special keywords
         # ex) [#id]
         headers = [email.in_reply_to, email.references].flatten.compact
         subject = email.subject.to_s
         if headers.detect {|h| h.to_s =~ MESSAGE_ID_RE} || subject.match(ISSUE_REPLY_SUBJECT_RE) || subject.match(MESSAGE_REPLY_SUBJECT_RE)
-          dispatch_without_email_integration
+          logger.debug "[redmine_email_integration] Delegate to redmine default method" if logger && logger.debug?
+          result = dispatch_without_email_integration
           save_message_id(email.message_id)
-          return
+          return result
         end
 
         origin_message_id = email.references.first if email.references.class == Array
@@ -36,18 +40,27 @@ module EmailIntegration
           # New mail
           issue = receive_issue
           issue.description = email_details + issue.description
-          issue.save
-          save_message_id(email.message_id, issue.id)
+          if issue.save
+            save_message_id(email.message_id, issue.id)
+            logger.debug "[redmine_email_integration] Save new mail as issue" if logger && logger.debug?
+          end
           return issue
         else
           # Reply mail
           origin_message = EmailMessage.find_by(message_id: origin_message_id)
-          return false if origin_message.nil?
+          if origin_message.nil?
+            logger.debug "[redmine_email_integration] This is reply mail but original message-id not found" if logger && logger.debug?
+            return false
+          end
+
+          logger.debug "[redmine_email_integration] Original message-id: #{origin_message.message_id}" if logger && logger.debug?
 
           journal = receive_issue_reply(origin_message.issue_id)
           journal.notes = email_details + email_reply_collapse(journal.notes)
-          journal.save
-          save_message_id(email.message_id)
+          if journal.save
+            save_message_id(email.message_id)
+            logger.debug "[redmine_email_integration] Save reply mail as journal" if logger && logger.debug?
+          end
           return journal
         end
       end
