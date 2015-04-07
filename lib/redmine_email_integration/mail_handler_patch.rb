@@ -107,7 +107,7 @@ module EmailIntegration
         ]
         patterns.each do |pattern|
           if notes =~ pattern
-            notes = notes.gsub(pattern,"{{collapse(Read More...)\r\n \\0\r\n}}")
+            notes = notes.sub(pattern,"{{collapse(Read More...)\r\n \\0\r\n}}")
             return notes
           end
         end
