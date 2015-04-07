@@ -56,7 +56,7 @@ module EmailIntegration
           logger.debug "[redmine_email_integration] Original message-id: #{origin_message.message_id}" if logger && logger.debug?
 
           journal = receive_issue_reply(origin_message.issue_id)
-          journal.notes = email_details + email_reply_collapse(journal.notes)
+          journal.notes = email_details + email_body_collapse(journal.notes)
           if journal.save
             save_message_id(email.message_id)
             logger.debug "[redmine_email_integration] Save reply mail as journal" if logger && logger.debug?
@@ -75,7 +75,7 @@ module EmailIntegration
         "<pre>\n" + Mail::Encodings.unquote_and_convert_to(email_details, 'utf-8') + "</pre>"
       end
 
-      def email_reply_collapse(notes)
+      def email_body_collapse(notes)
 
         # Email "Origianl Message" Patterns
         patterns = [
@@ -88,7 +88,7 @@ module EmailIntegration
           # 2015年3月22日 10:52 Taro Example <taro@example.com>:
           %r{^\d{4}年\d{1,2}月\d{1,2}日 [0-9]{1,2}:[0-9]{1,2}.*<[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}>:(?m).*},
 
-          # Outlook/Outlook Express
+          # Outlook/Outlook Express/Thunderbird
           # -----Original Message-----
           %r{^[-]*[\s]*Original Message[\s]*[-]*(?m).*},
 
@@ -102,7 +102,14 @@ module EmailIntegration
 
           # Thunderbird(old ja)
           # (2014/08/05 3:51), Taro Example wrote:
-          %r{\([0-9]{4}\/[0-9]{1,2}\/[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}\).*書きました:(?m).*}
+          %r{\([0-9]{4}\/[0-9]{1,2}\/[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}\).*書きました:(?m).*},
+
+          # Forwarded Mail
+          # -----転送メッセージ-----
+          %r{^[-]*[\s]*転送メッセージ[\s]*[-]*(?m).*},
+
+          # -------- Forwarded Message --------
+          %r{^[-]*[\s]*Forwarded Message[\s]*[-]*(?m).*}
 
         ]
         patterns.each do |pattern|
