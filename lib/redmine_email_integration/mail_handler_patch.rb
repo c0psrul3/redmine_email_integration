@@ -86,6 +86,9 @@ module EmailIntegration
           # 2015年3月22日 10:52 Taro Example <taro@example.com>:
           %r{^[> ]*\d{4}年\d{1,2}月\d{1,2}日 [0-9]{1,2}:[0-9]{1,2}.*<[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}>:(?m).*},
 
+          # From: Taro Example <taro@example.com>
+          %r{^[> ]*From:.*[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}(?m).*},
+
           # -----Original Message-----
           %r{^[> ]*[-]*[\s]*Original Message[\s]*[-]*(?m).*},
 
