@@ -80,31 +80,24 @@ module EmailIntegration
         # Email "Origianl Message" Patterns
         patterns = [
 
-          # Gamil
           # 2015-3-22 10:52 Taro Example <taro@example.com>:
           %r{^[> ]*\d{4}-\d{1,2}-\d{1,2} [0-9]{1,2}:[0-9]{1,2}.*<[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}>:(?m).*},
 
-          # Gamil(ja)
           # 2015年3月22日 10:52 Taro Example <taro@example.com>:
           %r{^[> ]*\d{4}年\d{1,2}月\d{1,2}日 [0-9]{1,2}:[0-9]{1,2}.*<[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}>:(?m).*},
 
-          # Outlook/Outlook Express/Thunderbird
           # -----Original Message-----
           %r{^[> ]*[-]*[\s]*Original Message[\s]*[-]*(?m).*},
 
-          # Outlook/Outlook Express(ja)
           # -----元のメッセージ-----
           %r{^[> ]*[-]*[\s]*元のメッセージ[\s]*[-]*(?m).*},
 
-          # Thunderbird
           # (2014/08/05 3:51), Taro Example wrote:
           %r{^[> ]*\([0-9]{4}\/[0-9]{1,2}\/[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}\).*wrote:(?m).*},
 
-          # Thunderbird(old ja)
           # (2014/08/05 3:51), Taro Example wrote:
           %r{^[> ]*\([0-9]{4}\/[0-9]{1,2}\/[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}\).*書きました:(?m).*},
 
-          # Forwarded Mail
           # -----転送メッセージ-----
           %r{^[> ]*[-]*[\s]*転送メッセージ[\s]*[-]*(?m).*},
 
