@@ -39,7 +39,7 @@ module EmailIntegration
         unless origin_message_id
           # New mail
           issue = receive_issue
-          issue.description = email_details + issue.description
+          issue.description = email_details + email_body_collapse(issue.description)
           if issue.save
             save_message_id(email.message_id, issue.id)
             logger.debug "[redmine_email_integration] Save new mail as issue" if logger && logger.debug?
@@ -56,7 +56,7 @@ module EmailIntegration
           logger.debug "[redmine_email_integration] Original message-id: #{origin_message.message_id}" if logger && logger.debug?
 
           journal = receive_issue_reply(origin_message.issue_id)
-          journal.notes = email_details + email_reply_collapse(journal.notes)
+          journal.notes = email_details + email_body_collapse(journal.notes)
           if journal.save
             save_message_id(email.message_id)
             logger.debug "[redmine_email_integration] Save reply mail as journal" if logger && logger.debug?
@@ -75,7 +75,7 @@ module EmailIntegration
         "<pre>\n" + Mail::Encodings.unquote_and_convert_to(email_details, 'utf-8') + "</pre>"
       end
 
-      def email_reply_collapse(notes)
+      def email_body_collapse(notes)
 
         # Email "Origianl Message" Patterns
         patterns = [
