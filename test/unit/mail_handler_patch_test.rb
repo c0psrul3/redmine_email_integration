@@ -52,6 +52,14 @@ class EmailMessageTest < ActiveSupport::TestCase
     assert_equal false, issue2
   end
 
+  def test_issue_id_in_title
+    result = submit_email('issue_id_in_title.eml',
+                         :issue => {:project => 'email_integration_project_1'},
+                         :unknown_user => 'accept',
+                         :no_permission_check => 1)
+    assert result.is_a?(Journal)
+  end
+
   def test_prevent_duplicate_reply
     issue = submit_email('new_email.eml',
                          :issue => {:project => 'email_integration_project_1'},

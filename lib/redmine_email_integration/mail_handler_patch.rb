@@ -29,6 +29,10 @@ module EmailIntegration
         if headers.detect {|h| h.to_s =~ MESSAGE_ID_RE} || subject.match(ISSUE_REPLY_SUBJECT_RE) || subject.match(MESSAGE_REPLY_SUBJECT_RE)
           logger.debug "[redmine_email_integration] Delegate to redmine default method" if logger && logger.debug?
           result = dispatch_without_email_integration
+          if result.class.name == "Journal"
+            result.notes = email_details + email_body_collapse(result.notes)
+            result.save
+          end
           save_message_id(email.message_id)
           return result
         end
@@ -86,8 +90,11 @@ module EmailIntegration
           # 2015年3月22日 10:52 Taro Example <taro@example.com>:
           %r{^[> ]*\d{4}年\d{1,2}月\d{1,2}日 [0-9]{1,2}:[0-9]{1,2}.*<[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}>:(?m).*},
 
-          # From: Taro Example <taro@example.com>
-          %r{^[> ]*From:.*[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}(?m).*},
+          # From: Taro Example [taro@example.com]
+          %r{^[> ]*From:.*\[mailto:[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\](?m).*},
+
+          # On 2015/04/15 16:54, Taro Example wrote:
+          %r{^[> ]*On.*wrote:(?m).*},
 
           # -----Original Message-----
           %r{^[> ]*[-]*[\s]*Original Message[\s]*[-]*(?m).*},
