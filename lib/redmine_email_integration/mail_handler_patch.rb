@@ -29,6 +29,10 @@ module EmailIntegration
         if headers.detect {|h| h.to_s =~ MESSAGE_ID_RE} || subject.match(ISSUE_REPLY_SUBJECT_RE) || subject.match(MESSAGE_REPLY_SUBJECT_RE)
           logger.debug "[redmine_email_integration] Delegate to redmine default method" if logger && logger.debug?
           result = dispatch_without_email_integration
+          if result.class.name == "Journal"
+            result.notes = email_details + email_body_collapse(result.notes)
+            result.save
+          end
           save_message_id(email.message_id)
           return result
         end
