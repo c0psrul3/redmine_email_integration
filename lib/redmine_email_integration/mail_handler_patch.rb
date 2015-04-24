@@ -88,7 +88,8 @@ module EmailIntegration
           %r{^[> ]*\d{4}-\d{1,2}-\d{1,2} [0-9]{1,2}:[0-9]{1,2}.*<[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}>:(?m).*},
 
           # 2015年3月22日 10:52 Taro Example <taro@example.com>:
-          %r{^[> ]*\d{4}年\d{1,2}月\d{1,2}日 [0-9]{1,2}:[0-9]{1,2}.*<[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}>:(?m).*},
+          # 2015年3月22日 Taro Example <taro@example.com>さんは書きました:
+          %r{^[> ]*\d{4}年\d{1,2}月\d{1,2}日.*<[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}>.*:(?m).*},
 
           # From: Taro Example [taro@example.com]
           %r{^[> ]*From:.*\[mailto:[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\](?m).*},
