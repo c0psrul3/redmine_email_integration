@@ -116,10 +116,12 @@ module EmailIntegration
           %r{^[> ]*[-]*[\s]*Forwarded Message[\s]*[-]*(?m).*}
 
         ]
-        patterns.each do |pattern|
-          if notes =~ pattern
-            notes = notes.sub(pattern,"{{collapse(Read More...)\r\n \\0\r\n}}")
-            return notes
+        notes.lines.each do |line|
+          patterns.each do |pattern|
+            if line =~ pattern
+              notes = notes.sub(pattern,"{{collapse(Read More...)\r\n \\0\r\n}}")
+              return notes
+            end
           end
         end
         notes
