@@ -97,6 +97,9 @@ module EmailIntegration
           # On 2015/04/15 16:54, Taro Example wrote:
           %r{^[> ]*On.*wrote:(?m).*},
 
+          # On Tue, 4 Aug 2015 17:03:05
+          %r{^[> ]*On.*[A-z]*,.*[0-9]*(?m).*},
+
           # -----Original Message-----
           %r{^[> ]*[-]*[\s]*Original Message[\s]*[-]*(?m).*},
 
